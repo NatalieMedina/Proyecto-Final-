@@ -1,0 +1,164 @@
+[7:37 p. m., 20/11/2019] Iñigo: import java.net.*;
+import java.io.*;
+import java.util.*;
+
+public class ManejoDB{
+
+	ArrayList<String> sendMail =new ArrayList<String>();
+		String envios="";
+		public void sendmail(String in){
+			Scanner bety=new Scanner(in);
+			while(bety.hasNext()){   //separamos el correo
+				envios=bety.next();
+				if(!envios.equals("*")){//hasta que el correo no sea el final
+					sendMail.add(envios);//agregamos los correos separados 
+						}
+
+			}
+
+	String algo;
+	DB conexion=new DB("testDb.db");
+	if(conexion.connect()){
+		int send=sendMail.size();
+		for(int i=0;i<send;i++){
+			algo=sendMail.get(i);
+
+
+			conexion.executeNonQuery("INSERT INTO Correos (Receptor) VALUES ('"+algo+"')");
+
+		}
+
+	}else{
+		System.out.println("ERRO EN LA CONEXION DE LA BASE DE DATOS");
+	}
+		conexion.close();
+}
+
+
+//actualizar correos
+
+		public boolean actualizar(String n){
+			String algo="";
+			boolean retorno;
+
+			DB conexion = new DB("testDb.db");
+			if(conexion.connect()){
+				for(int i=0; i<sendMail.size();i++){
+					algo=sendMail.get(i);
+					conexion.executeNonQuery("UPDATE Correos SET Asunto ='"+in+"' WHERE Receptor ='"+algo+"'");
+					retorno = true;
+
+				}
+
+
+			}else{
+				System.out.println("ERROR EN LA CONEXION EN LA BASE DE DATOS");
+			}
+			return	retorno;
+			conexion.close();
+
+		}
+
+
+	public boolean valuser(String username){
+		boolean retorno;
+		DB conexion = new DB("testDb.db"); //crear un objeto de tipo DB
+		if (conexion.connect()){ // si la conexion se efectua se reaiza lo siguiente
+			String query =  "SELECT Nombre FROM Usuarios WHERE Contrasena LIKE"+ " " +"'"+ username+"'";
+			boolean torf = conexion.executeQuery(query);
+			String pimport = (String)conexion.getString("username");
+			if (conexion.next() && primport.equals(username)){
+				retorno=true;
+			}
+
+		}
+		//si la conexion no se realiza 
+		else { 
+			System.out.println("ERROR EN CONEXION");
+		}
+		return retorno; //retorna si el usuario es igual al ingresado 
+		conexion.close();
+	}
+
+	public boolean valpassword(String password){
+		boolean retorno;
+		DB conexion = new DB("testDb.db"); //crear un objeto de tipo DB
+		if (conexion.connect()){ // si la conexion se efectua se reaiza lo siguiente
+			String query =  "SELECT Contrasena FROM Usuarios WHERE Contrasena LIKE"+ " " +"'"+ password+"'";
+			boolean torf = conexion.executeQuery(query);
+			String pimport = (String)conexion.getString("password");
+			if (conexion.next() && primport.equals(password)){
+				retorno=true;
+			}
+
+		}
+		//si la conexion no se realiza 
+		else { 
+			System.out.println("ERROR EN CONEXION");
+		}
+		return retorno;
+		conexion.close();
+	}
+
+
+	//metodo usado para devolver la cola de contactos 
+	public Stack<String> qcontactos(String username){
+		Stack<String> qcontactos = new Stack<String>();
+		DB conexion = new DB("testDb.db");
+		String retorno;
+		if (conexion.connect()){
+			boolean torf = conexion.executeQuery("SELECT Contactos.Nombre,Servidores.Servidor FROM Servidores,Usuarios INNER JOIN Contactos ON Contactos.Servidor = Servidores.IP AND Contactos.Contacto_de = Usuarios.Nombre WHERE Usuarios.Nombre = '"+ nomUser+"'");
+			while (conexion.next()){
+				String username = (String)conexion.getString("Nombre");
+				String servername = (String)conexion.getString("Servidor");
+				retorno = (String)(username+"@"+servername+"\n");
+				qcontactos.push(retorno);
+			}
+			String ultimo = qcontactos.pop();
+			ultimo= ultimo+"*";
+			qcontactos.push();
+		}	
+		else {System.out.println("ERROR EN LA CONEXION CON LA BASE DE DATOS");}
+			return qcontactos;
+		conexion.close();
+	}
+
+	public boolean newcont(String sender){
+		DB conexion = new DB("testDb.db");
+		boolean retorno;
+		boolean name = conexion.executeQuery("SELECT Correo FROM Usuarios WHERE Nombre LIKE"+ " " +"'"+sender+"'");
+		if (conexion.connect() && (conexion.getString("Correo").equals(sender))) {
+			System.out.println("ERROR EN LA CONEXION CON LA BASE DE DATOS");
+			retorno = true;
+		}
+		else {System.out.println("Error en db"+myDb.getError());}
+		return retorno;
+		conexion.close();
+	}
+
+	public Stack<String> newmails (String username){
+		DB conexion = new DB("testDb.db");
+		Stack<String> mails = new Stack<String>();
+		if(conexion.connect())
+		{
+			boolean torf = conexion.executeQuery("SELECT Contactos.Correo,Correos.Asunto,Correos.Cuerpo FROM Correos,Usuarios INNER JOIN Contactos ON Contactos.Correo = Correos.Receptor AND Contactos.Contacto_de = Usuarios.Nombre WHERE Usuarios.Nombre = '"+ username+"'");
+			while(conexion.next()){
+				String sender = (String)conexion.getString("Correo");
+				String subject = (String)conexion.getString("Asunto");
+				String body = (String)conexion.getString("Cuerpo");
+				retorno = ""+sender+", " +subject+", "+body;
+				mails.push(retorno);
+			}
+			String as = mails.pop();
+			as = as+"*";
+			mail.push();
+		}
+		else {System.out.println("ERROR EN LA CONEXION DE LA BASE DE DATOS");}
+		return mails;
+		conexion.close();
+	} 
+
+	
+
+
+}
