@@ -1,0 +1,62 @@
+import java.io.*;
+import java.net.*;
+import java.util.*;
+import java.util.regex.Pattern;
+public class Servidor{
+	
+	 static int PUERTO;
+
+	
+		BufferedReader entrada;
+		DataOutputStream salida;
+		DataInputStream entradacliente;
+		Socket sc;
+		ServerSocket sk;
+		public void initServidor(int PUERTO){
+			try{
+			entrada=new BufferedReader(new InputStreamReader(System.in));
+			entradacliente= new DataInputStream(sc.getInputStream());
+			salida = new DataOutputStream(sc.getOutputStream());
+			sc=new Socket();
+			sk = new ServerSocket(PUERTO);
+
+			System.out.println("Esperando conexión...");
+			sc=sk.accept();
+			salida.writeUTF("Bienvenid@ a nuestro Correo");
+			System.out.println("Cliente se ha conectado...");
+			System.out.println("Confirmado la conexion");
+			salida.writeUTF("Conexion exitosa");
+			//-----------------------------------
+			String usuario="";
+			String login="";
+			String pass="";
+
+			while((usuario=entradacliente.readUTF())!=null){
+				if(Pattern.matches("(([a-z])([a-z_0-9]))@({1,})",usuario)){
+					System.out.println(usuario);
+
+				}
+
+				}
+
+				
+		
+
+			}catch(Exception e){
+			System.out.println("No hubo conexion");
+
+
+		}
+			
+
+		
+		}
+
+
+		
+
+	public static void main(String[] args) {
+		Servidor o = new Servidor();
+		o.initServidor(7000);
+	}
+}
