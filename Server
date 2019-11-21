@@ -1,0 +1,173 @@
+import java.net.*;
+import java.io.*;
+import java.util.Scanner;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
+
+ 
+public class Server{
+    static int PUERTO;
+    ServerSocket sc;
+    Socket so;
+    DataOutputStream salida;
+    DataInputStream entrada;
+    String mensajeRecibido;
+ 
+    public void initServidor(int PUERTO){
+         
+        Scanner teclado = new Scanner(System.in);
+        try{
+            sc = new ServerSocket(PUERTO);
+            so = new Socket();
+             
+            System.out.println("Esperando conexión...");
+            so = sc.accept();
+            System.out.println("Se conecto uno...");
+            entrada = new DataInputStream(so.getInputStream());
+            salida = new DataOutputStream(so.getOutputStream());
+            String msn = "", STATEUSER="LOGOUT",STATESERVER="Offline"; 
+
+            while(!msn.equals("EXIT")){ 
+                mensajeRecibido = entrada.readUTF();//Leemos el mensaje del cliente
+
+
+                System.out.println(mensajeRecibido);
+                if(mensajeRecibido.substring(0,6).equals("LOGIN ")){
+
+                    int l= (mensajeRecibido.length());
+                    String ncorreo=mensajeRecibido.substring(6,l);
+                    Scanner correo = new Scanner(ncorreo);
+                    //correo.useDelimiter("[@]");
+                    String username = correo.next();
+                    String password = correo.next();
+                    if(username.equals("username")){
+                         //El usuario esta en la tabla?     
+                        //System.out.println("Ingrese Password");
+
+                        if(password.equals("password")){
+                         //El password pertenece al usuario?     
+                             salida.writeUTF("OK LOGIN");//Enviar respuesta a cliente
+                            //Accion correspondiente a verificar si el contacto esta registrado
+                             STATEUSER="Logged In";
+    
+
+                        }
+                        else{System.out.println("LOGIN ERROR 102 INVALID PASSWORD");}
+                        
+                    } 
+
+                    else{System.out.println("LOGIN ERROR 101 UNKNOWN USER");}
+
+                }
+
+                else if(mensajeRecibido.substring(0,6).equals("CLIST ")){
+                    salida.writeUTF("OK CLIST");//Respuesta de confirmacion
+                    /*Accion correspondiente a enviar la lista de  contactos, desplegar lista de contactos, 
+                    el ultimo contacto con * 
+                    
+                    if(clist.empty()){
+                        salida.writeUTF("CLIST ERROR 103 NO CONTACTS FOUND");
+                    }
+                    else if(clist.length()==1){
+                        salida.writeUTF(clist[0]+"*");
+                    }
+                    else{
+                        int length = clist.length-1;
+                        for(int i=0; i<length;i++){
+                            salida.writeUTF(clist[length]);
+                        }
+                        salida.writeUTF(clist[length]+"*");
+                    }
+                    */
+                }
+
+                else if(mensajeRecibido.substring(0,12).equals("GETNEWMAILS ")){
+                    salida.writeUTF("OK NEWMAILS");//Respuesta de confirmacion
+                    /*Accion correspondiente a desplegar la lista de nuevos mails,  
+                    el ultimo mail con * 
+                    
+                    if(nmails.empty()){
+                        salida.writeUTF("OK GETNEWMAILS NOMAILS");
+                    }
+                    else if(nmails.length()==1){
+                        salida.writeUTF(clist[0]+"*");
+                    }
+                    else{
+                        int length = nmails.length-1;
+                        for(int i=0; i<length;i++){
+                            salida.writeUTF(nmails[length]);
+                        }
+                        salida.writeUTF(nmails[length]+"*");
+                    }
+                    */
+                }
+
+                else if(mensajeRecibido.substring(0,10).equals("SEND MAIL ")){
+                    //Accion correspondiente a enviar un nuevo mail
+                     /* mailto = entrada.readUTF();
+                        if (mailto.substring(0,8).equals("MAIL TO ")){
+                            mensajeRecibido = entrada.readUTF() ;
+                                
+                        }*/
+                        salida.writeUTF("OK SEND MAIL");//Respuesta de confirmacion
+                            
+                }
+
+                else if(mensajeRecibido.substring(0,8).equals("NEWCONT ")){
+                    //Accion correspondiente a crear un nuevo contacto
+                     int l= (mensajeRecibido.length());
+                     String ncorreo=mensajeRecibido.substring(8,l);
+                     Scanner correo = new Scanner(ncorreo);
+                     correo.useDelimiter("[@]");
+                     String username = correo.next();
+                     String servername = correo.next();
+                     if(servername.equals("servername")){
+
+                     salida.writeUTF("OK NEWCONT");//Respuesta de confirmacion
+                     }
+                     /*else if()
+                     verificar si el servidor esta online y si este existe 
+                     si no System.out.println("NEWCONT ERROR 110 SERVER NOT FOUND");
+                     */
+                     else{System.out.println("NEWCONT ERROR 109 CONTACT NOT FOUND "+mensajeRecibido);}
+                    
+                }
+
+                else if(mensajeRecibido.substring(0,7).equals("LOGOUT ")){
+                    //Accion correspondiente hacer del clinte un offline
+                    STATEUSER="LOGOUT";
+                    salida.writeUTF("OK LOGOUT");
+                }
+
+                else if(mensajeRecibido.substring(0,5).equals("NOOP ")){
+                    salida.writeUTF("OK NOOP");//Respuesta de confirmacion
+                    //Accion que permite a el cliente seguir conectado
+                }
+
+                else{
+                    salida.writeUTF("INGRESO DE COMANDO ERRONERO REVISAR ENTRADA DEL CLIENTE");
+                }
+                /*System.out.println("Escriba un msn para enviar");
+                msn = teclado.nextLine();
+                salida.writeUTF(""+msn);//enviamos mensaje
+                */
+            }
+            sc.close();
+        }
+        catch(Exception e){
+ 
+        }
+    }
+ 
+    public static void main(String[] args){
+        Server o = new Server();
+        //System.out.println("Ingrese el puerto de conexion: ")
+        o.initServidor(7000);
+    }
+ 
+}
