@@ -1,0 +1,79 @@
+import java.util.Scanner;
+import java.util.regex.Pattern;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.*;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+
+public class Pruebas extends JFrame implements ActionListener{
+    private JLabel texto; //Etiqueta
+    private JButton boton;//boton en donde pulsar
+    
+
+    
+    public Pruebas(String n){
+        super();//heredamos todo los campos del JFrame
+        configurar();//campo privado de configurar la ventana
+        inicializar(n);
+       
+
+
+    }
+
+
+    public void configurar(){
+        this.setTitle("LOGIN");
+        this.setSize(400,200);
+        this.setResizable(true); 
+        this.setLayout(null); 
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+          this.setLocationRelativeTo(null);    
+
+    }
+
+    public void inicializar(String n){
+        texto=new JLabel();
+        boton=new JButton();
+        //Configuramos los adornos
+        texto.setText(n);
+        texto.setBounds(120,50,300,50);
+        boton.setText("Enviar");
+        boton.setBounds(100,90,300,30);
+        boton.addActionListener(this);
+        //Agregarlos a la ventana
+        this.add(texto);
+       // this.add(boton);
+    
+    }   
+    @Override
+    public void actionPerformed(ActionEvent e){
+        //String nombre = cajatexto.getText();
+        JOptionPane.showMessageDialog(null, "Correo enviado", "Tu muy bien", JOptionPane.INFORMATION_MESSAGE);
+
+    }
+
+
+	public static void main(String[] args){
+        Pruebas email= new Pruebas("fuck u motherfcuker");
+        email.setVisible(true);
+        
+		Scanner teclado = new Scanner(System.in);
+		System.out.println("Ingrese comando y correo");
+		String mensajeRecibido = teclado.nextLine();
+		            int l= (mensajeRecibido.length());
+                    String ncorreo=mensajeRecibido.substring(6,l);
+                    String comando= mensajeRecibido.substring(0,6);
+                    System.out.println("Comando , length "+comando + l);
+                    System.out.println(mensajeRecibido.substring(6,l));
+                    Scanner correo = new Scanner(ncorreo);
+                    correo.useDelimiter("[@]");
+                    String username = correo.next();
+                    System.out.println("username: " +username);
+                    String servername = correo.next();
+                    System.out.println("servername: " + servername);
+                   // Error(101);     
+                    
+    }
+}
